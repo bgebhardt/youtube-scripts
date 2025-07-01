@@ -24,6 +24,8 @@ A set of scripts for summarizing youtube videos.
   - Use {transcript_text} as placeholder for the transcript
   - See prompts/basic.md and prompts/prompt.md for examples
 
+You can create different custom prompts optimized to summarize different types of videos better: technical, roleplaying, video games, etc.
+
 # Setup Notes
 
 You can get your Gemini API key from: [Get API key | Google AI Studio](https://aistudio.google.com/app/apikey)
