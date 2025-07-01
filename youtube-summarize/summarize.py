@@ -9,7 +9,7 @@ from pathlib import Path
 from google import genai
 
 
-def summarize_with_gemini(transcript_text: str, metadata: dict = None, prompt_file: str = "prompts/basic.md") -> str:
+def summarize_with_gemini(transcript_text: str, metadata: dict = None, prompt_file: str = "prompts/default.md") -> str:
     """
     Summarize transcript using Gemini Python API.
     """
@@ -79,7 +79,7 @@ def main():
         print("Generating summary with Gemini...")
         
         # Use default prompt if running standalone
-        prompt_file = "prompts/basic.md"
+        prompt_file = "prompts/default.md"
         if len(sys.argv) > 2:
             prompt_file = sys.argv[2]
         

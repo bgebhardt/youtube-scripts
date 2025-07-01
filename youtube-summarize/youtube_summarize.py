@@ -15,7 +15,7 @@ def main():
     parser.add_argument('url', help='YouTube video URL')
     parser.add_argument('--output-dir', default='downloads', help='Output directory (default: downloads)')
     parser.add_argument('--cleanup', action='store_true', help='Delete interim files (audio, transcript) after summarization')
-    parser.add_argument('--prompt', default='prompts/basic.md', help='Path to prompt file (default: prompts/basic.md)')
+    parser.add_argument('--prompt', default='prompts/default.md', help='Path to prompt file (default: prompts/default.md)')
     
     args = parser.parse_args()
     
@@ -54,6 +54,7 @@ def main():
 - Duration: {metadata.get('duration', 'N/A')} seconds
 - View Count: {metadata.get('view_count', 'N/A')}
 - URL: {metadata.get('webpage_url', 'N/A')}
+- Prompt Used: {args.prompt}
 
 Description:
 {metadata.get('description', 'N/A')}
