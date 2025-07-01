@@ -9,7 +9,7 @@ from pathlib import Path
 from google import genai
 
 
-def summarize_with_gemini(transcript_text: str, prompt_file: str = "prompts/basic.md") -> str:
+def summarize_with_gemini(transcript_text: str, metadata: dict = None, prompt_file: str = "prompts/basic.md") -> str:
     """
     Summarize transcript using Gemini Python API.
     """
@@ -25,7 +25,24 @@ def summarize_with_gemini(transcript_text: str, prompt_file: str = "prompts/basi
         raise FileNotFoundError(f"Prompt file not found: {prompt_file}")
     
     prompt_template = prompt_path.read_text(encoding='utf-8')
-    prompt = prompt_template.format(transcript_text=transcript_text)
+    
+    # Format metadata for inclusion in prompt
+    metadata_text = ""
+    if metadata:
+        metadata_text = f"""
+Video Metadata:
+- Title: {metadata.get('title', 'N/A')}
+- Channel: {metadata.get('channel', 'N/A')}
+- Upload Date: {metadata.get('upload_date', 'N/A')}
+- Duration: {metadata.get('duration', 'N/A')} seconds
+- Description: {metadata.get('description', 'N/A')[:500]}...
+
+"""
+    
+    prompt = prompt_template.format(
+        transcript_text=transcript_text,
+        metadata=metadata_text
+    )
     
     try:
         response = client.models.generate_content(
@@ -67,7 +84,7 @@ def main():
             prompt_file = sys.argv[2]
         
         # Generate summary
-        summary = summarize_with_gemini(transcript_text, prompt_file)
+        summary = summarize_with_gemini(transcript_text, None, prompt_file)
         
         # Save summary
         summary_file = transcript_file.with_suffix('.summary.txt')

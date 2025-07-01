@@ -24,7 +24,7 @@ def main():
         
         # Download and extract transcript
         downloader = YouTubeDownloader(args.output_dir)
-        video_id, transcript = downloader.download_with_transcript(args.url, cleanup=args.cleanup)
+        video_id, transcript, metadata = downloader.download_with_transcript(args.url, cleanup=args.cleanup)
         
         if not transcript:
             print("Could not extract transcript from video")
@@ -43,7 +43,7 @@ def main():
         else:
             # Generate summary
             print("Generating summary with Gemini...")
-            summary = summarize_with_gemini(transcript, args.prompt)
+            summary = summarize_with_gemini(transcript, metadata, args.prompt)
             
             # Save summary
             summary_file.write_text(summary, encoding='utf-8')

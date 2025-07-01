@@ -8,7 +8,7 @@ import sys
 import json
 import tempfile
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Dict
 import yt_dlp
 import whisper
 
@@ -18,28 +18,39 @@ class YouTubeDownloader:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
         
-    def download_with_transcript(self, url: str, cleanup: bool = False) -> Tuple[str, Optional[str]]:
+    def download_with_transcript(self, url: str, cleanup: bool = False) -> Tuple[str, Optional[str], Dict]:
         """
         Download YouTube video and extract transcript.
-        Returns: (video_id, transcript_text or None)
+        Returns: (video_id, transcript_text or None, metadata)
         """
-        video_id = self._get_video_id(url)
+        # Extract metadata first
+        metadata = self._extract_metadata(url)
+        video_id = metadata['id']
+        
+        # Save metadata to file
+        metadata_file = self.output_dir / f"{video_id}_metadata.json"
+        if not metadata_file.exists():
+            metadata_file.write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding='utf-8')
+            print(f"Metadata saved to: {metadata_file}")
+        else:
+            print(f"Found existing metadata: {metadata_file}")
         
         # Check if transcript file already exists
         transcript_file = self.output_dir / f"{video_id}_transcript.txt"
         if transcript_file.exists():
             print(f"Found existing transcript: {transcript_file}")
             transcript = transcript_file.read_text(encoding='utf-8')
-            return video_id, transcript
+            return video_id, transcript, metadata
         
         # Try to get transcript/subtitles from YouTube
         transcript = self._extract_transcript(url)
         
         if transcript:
-            return video_id, transcript
+            return video_id, transcript, metadata
             
         # Fallback: download audio and transcribe with Whisper
-        return self._download_and_transcribe(url, cleanup)
+        video_id, transcript = self._download_and_transcribe(url, cleanup)
+        return video_id, transcript, metadata
     
     def _extract_transcript(self, url: str) -> Optional[str]:
         """Extract transcript/subtitles if available."""
@@ -139,6 +150,32 @@ class YouTubeDownloader:
         
         return result["text"]
     
+    def _extract_metadata(self, url: str) -> Dict:
+        """Extract video metadata."""
+        ydl_opts = {
+            'quiet': True,
+            'no_warnings': True,
+        }
+        
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(url, download=False)
+            
+            metadata = {
+                'id': info.get('id'),
+                'title': info.get('title'),
+                'uploader': info.get('uploader'),
+                'channel': info.get('channel'),
+                'channel_id': info.get('channel_id'),
+                'upload_date': info.get('upload_date'),
+                'description': info.get('description'),
+                'duration': info.get('duration'),
+                'view_count': info.get('view_count'),
+                'webpage_url': info.get('webpage_url'),
+                'thumbnail': info.get('thumbnail'),
+            }
+            
+            return metadata
+    
     def _get_video_id(self, url: str) -> str:
         """Extract video ID from URL."""
         with yt_dlp.YoutubeDL() as ydl:
@@ -155,7 +192,7 @@ def main():
     downloader = YouTubeDownloader()
     
     try:
-        video_id, transcript = downloader.download_with_transcript(url)
+        video_id, transcript, metadata = downloader.download_with_transcript(url)
         
         # Save transcript to file
         transcript_file = downloader.output_dir / f"{video_id}_transcript.txt"
