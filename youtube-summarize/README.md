@@ -24,6 +24,15 @@ A set of scripts for summarizing youtube videos.
   - Use {transcript_text} as placeholder for the transcript
   - See prompts/basic.md and prompts/prompt.md for examples
 
+# Setup Notes
+
+You can get your Gemini API key from: [Get API key | Google AI Studio](https://aistudio.google.com/app/apikey)
+
+- [Gemini API quickstart  |  Google AI for Developers](https://ai.google.dev/gemini-api/docs/quickstart#python)
+- [Using Gemini API keys  |  Google AI for Developers](https://ai.google.dev/gemini-api/docs/api-key#set-api-env-var)
+
+[openai/whisper: Robust Speech Recognition via Large-Scale Weak Supervision](https://github.com/openai/whisper)
+
 # Requirements
 
 In the youtube-summarize directory create a script or set of scripts that will
