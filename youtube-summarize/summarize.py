@@ -9,7 +9,7 @@ from pathlib import Path
 from google import genai
 
 
-def summarize_with_gemini(transcript_text: str) -> str:
+def summarize_with_gemini(transcript_text: str, prompt_file: str = "prompts/basic.md") -> str:
     """
     Summarize transcript using Gemini Python API.
     """
@@ -19,16 +19,13 @@ def summarize_with_gemini(transcript_text: str) -> str:
     
     client = genai.Client()
     
-    prompt = f"""Please provide a comprehensive summary of this YouTube video transcript. 
-Include:
-- Main topic and key points
-- Important details and insights
-- Actionable takeaways if any
-- Overall conclusion
-
-Transcript:
-{transcript_text}
-"""
+    # Load prompt from file
+    prompt_path = Path(prompt_file)
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {prompt_file}")
+    
+    prompt_template = prompt_path.read_text(encoding='utf-8')
+    prompt = prompt_template.format(transcript_text=transcript_text)
     
     try:
         response = client.models.generate_content(
@@ -64,8 +61,13 @@ def main():
             
         print("Generating summary with Gemini...")
         
+        # Use default prompt if running standalone
+        prompt_file = "prompts/basic.md"
+        if len(sys.argv) > 2:
+            prompt_file = sys.argv[2]
+        
         # Generate summary
-        summary = summarize_with_gemini(transcript_text)
+        summary = summarize_with_gemini(transcript_text, prompt_file)
         
         # Save summary
         summary_file = transcript_file.with_suffix('.summary.txt')

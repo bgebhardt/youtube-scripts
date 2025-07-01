@@ -15,6 +15,7 @@ def main():
     parser.add_argument('url', help='YouTube video URL')
     parser.add_argument('--output-dir', default='downloads', help='Output directory (default: downloads)')
     parser.add_argument('--cleanup', action='store_true', help='Delete interim files (audio, transcript) after summarization')
+    parser.add_argument('--prompt', default='prompts/basic.md', help='Path to prompt file (default: prompts/basic.md)')
     
     args = parser.parse_args()
     
@@ -34,13 +35,18 @@ def main():
         transcript_file.write_text(transcript, encoding='utf-8')
         print(f"Transcript saved to: {transcript_file}")
         
-        # Generate summary
-        print("Generating summary with Gemini...")
-        summary = summarize_with_gemini(transcript)
-        
-        # Save summary
+        # Check if summary already exists
         summary_file = transcript_file.with_suffix('.summary.txt')
-        summary_file.write_text(summary, encoding='utf-8')
+        if summary_file.exists():
+            print(f"Found existing summary: {summary_file}")
+            summary = summary_file.read_text(encoding='utf-8')
+        else:
+            # Generate summary
+            print("Generating summary with Gemini...")
+            summary = summarize_with_gemini(transcript, args.prompt)
+            
+            # Save summary
+            summary_file.write_text(summary, encoding='utf-8')
         
         print(f"Summary saved to: {summary_file}")
         print("\n" + "="*50)

@@ -10,6 +10,20 @@ A set of scripts for summarizing youtube videos.
   3. Set the environment variable: export GEMINI_API_KEY=your_api_key_here
   4. Run ./run.sh <youtube_url>
 
+  Usage:
+  # Use default basic prompt
+  ./run.sh https://www.youtube.com/watch?v=example
+
+  # Use the detailed technical prompt
+  ./run.sh https://www.youtube.com/watch?v=example --prompt prompts/prompt.md
+
+  # Use a custom prompt file
+  ./run.sh https://www.youtube.com/watch?v=example --prompt my_custom_prompt.md
+
+  Prompt file format:
+  - Use {transcript_text} as placeholder for the transcript
+  - See prompts/basic.md and prompts/prompt.md for examples
+
 # Requirements
 
 In the youtube-summarize directory create a script or set of scripts that will
