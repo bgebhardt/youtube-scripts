@@ -27,8 +27,12 @@ class YouTubeDownloader:
         metadata = self._extract_metadata(url)
         video_id = metadata['id']
         
+        # Create video-specific directory
+        video_dir = self.output_dir / video_id
+        video_dir.mkdir(exist_ok=True)
+        
         # Save metadata to file
-        metadata_file = self.output_dir / f"{video_id}_metadata.json"
+        metadata_file = video_dir / "metadata.json"
         if not metadata_file.exists():
             metadata_file.write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding='utf-8')
             print(f"Metadata saved to: {metadata_file}")
@@ -36,30 +40,30 @@ class YouTubeDownloader:
             print(f"Found existing metadata: {metadata_file}")
         
         # Check if transcript file already exists
-        transcript_file = self.output_dir / f"{video_id}_transcript.txt"
+        transcript_file = video_dir / "transcript.txt"
         if transcript_file.exists():
             print(f"Found existing transcript: {transcript_file}")
             transcript = transcript_file.read_text(encoding='utf-8')
             return video_id, transcript, metadata
         
         # Try to get transcript/subtitles from YouTube
-        transcript = self._extract_transcript(url)
+        transcript = self._extract_transcript(url, video_dir)
         
         if transcript:
             return video_id, transcript, metadata
             
         # Fallback: download audio and transcribe with Whisper
-        video_id, transcript = self._download_and_transcribe(url, cleanup)
+        video_id, transcript = self._download_and_transcribe(url, video_dir, cleanup)
         return video_id, transcript, metadata
     
-    def _extract_transcript(self, url: str) -> Optional[str]:
+    def _extract_transcript(self, url: str, video_dir: Path) -> Optional[str]:
         """Extract transcript/subtitles if available."""
         ydl_opts = {
             'writesubtitles': True,
             'writeautomaticsub': True,
             'subtitleslangs': ['en'],
             'skip_download': True,
-            'outtmpl': str(self.output_dir / '%(id)s.%(ext)s'),
+            'outtmpl': str(video_dir / '%(id)s.%(ext)s'),
         }
         
         try:
@@ -72,7 +76,7 @@ class YouTubeDownloader:
                 
                 # Look for subtitle files
                 for ext in ['en.vtt', 'en.srt']:
-                    subtitle_file = self.output_dir / f"{video_id}.{ext}"
+                    subtitle_file = video_dir / f"{video_id}.{ext}"
                     if subtitle_file.exists():
                         return self._parse_subtitle_file(subtitle_file)
                         
@@ -103,12 +107,12 @@ class YouTubeDownloader:
         
         return ' '.join(transcript_lines)
     
-    def _download_and_transcribe(self, url: str, cleanup: bool = False) -> Tuple[str, str]:
+    def _download_and_transcribe(self, url: str, video_dir: Path, cleanup: bool = False) -> Tuple[str, str]:
         """Download audio and transcribe with Whisper."""
         print("No transcript found. Downloading audio for transcription...")
         
         # Download audio only
-        audio_file = self._download_audio(url)
+        audio_file = self._download_audio(url, video_dir)
         video_id = self._get_video_id(url)
         
         # Transcribe with Whisper
@@ -123,11 +127,11 @@ class YouTubeDownloader:
         
         return video_id, transcript
     
-    def _download_audio(self, url: str) -> Path:
+    def _download_audio(self, url: str, video_dir: Path) -> Path:
         """Download audio only."""
         ydl_opts = {
             'format': 'bestaudio/best',
-            'outtmpl': str(self.output_dir / '%(id)s.%(ext)s'),
+            'outtmpl': str(video_dir / '%(id)s.%(ext)s'),
             'postprocessors': [{
                 'key': 'FFmpegExtractAudio',
                 'preferredcodec': 'wav',
@@ -138,7 +142,7 @@ class YouTubeDownloader:
             info = ydl.extract_info(url, download=True)
             video_id = info['id']
             
-        audio_file = self.output_dir / f"{video_id}.wav"
+        audio_file = video_dir / f"{video_id}.wav"
         return audio_file
     
     def _transcribe_audio(self, audio_file: Path) -> str:
@@ -195,7 +199,8 @@ def main():
         video_id, transcript, metadata = downloader.download_with_transcript(url)
         
         # Save transcript to file
-        transcript_file = downloader.output_dir / f"{video_id}_transcript.txt"
+        video_dir = downloader.output_dir / video_id
+        transcript_file = video_dir / "transcript.txt"
         transcript_file.write_text(transcript, encoding='utf-8')
         
         print(f"Transcript saved to: {transcript_file}")

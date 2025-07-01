@@ -31,12 +31,13 @@ def main():
             sys.exit(1)
             
         # Save transcript
-        transcript_file = downloader.output_dir / f"{video_id}_transcript.txt"
+        video_dir = downloader.output_dir / video_id
+        transcript_file = video_dir / "transcript.txt"
         transcript_file.write_text(transcript, encoding='utf-8')
         print(f"Transcript saved to: {transcript_file}")
         
         # Check if summary already exists
-        summary_file = transcript_file.with_suffix('.summary.txt')
+        summary_file = video_dir / "summary.txt"
         if summary_file.exists():
             print(f"Found existing summary: {summary_file}")
             summary = summary_file.read_text(encoding='utf-8')
@@ -58,6 +59,10 @@ def main():
         if args.cleanup:
             transcript_file.unlink()
             print(f"\nTranscript file removed: {transcript_file}")
+            # Also clean up the directory if it's empty (except for summary)
+            remaining_files = [f for f in video_dir.iterdir() if f.name != "summary.txt"]
+            if not remaining_files:
+                print(f"Video directory cleaned up: {video_dir}")
             
     except Exception as e:
         print(f"Error: {e}")
