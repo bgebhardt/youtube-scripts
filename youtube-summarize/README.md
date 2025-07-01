@@ -26,6 +26,20 @@ A set of scripts for summarizing youtube videos.
 
 You can create different custom prompts optimized to summarize different types of videos better: technical, roleplaying, video games, etc.
 
+ File Structure:
+  downloads/
+  └── {video_id}/
+      ├── metadata.json
+      ├── transcript.txt
+      ├── summary.default.md     # Using default.md prompt
+      ├── summary.basic.md       # Using basic.md prompt
+      └── summary.prompt.md      # Using prompt.md prompt
+
+  Examples:
+  - prompts/default.md → summary.default.md
+  - prompts/basic.md → summary.basic.md
+  - prompts/technical.md → summary.technical.md
+
 # Setup Notes
 
 You can get your Gemini API key from: [Get API key | Google AI Studio](https://aistudio.google.com/app/apikey)
