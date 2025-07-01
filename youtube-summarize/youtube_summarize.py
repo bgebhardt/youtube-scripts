@@ -46,14 +46,35 @@ def main():
             print("Generating summary with Gemini...")
             summary = summarize_with_gemini(transcript, metadata, args.prompt)
             
-            # Save summary
-            summary_file.write_text(summary, encoding='utf-8')
+            # Prepend metadata to summary
+            metadata_text = f"""Video Information:
+- Title: {metadata.get('title', 'N/A')}
+- Channel: {metadata.get('channel', 'N/A')}
+- Upload Date: {metadata.get('upload_date', 'N/A')}
+- Duration: {metadata.get('duration', 'N/A')} seconds
+- View Count: {metadata.get('view_count', 'N/A')}
+- URL: {metadata.get('webpage_url', 'N/A')}
+
+Description:
+{metadata.get('description', 'N/A')}
+
+{"="*60}
+SUMMARY:
+{"="*60}
+
+{summary}"""
+            
+            # Save summary with metadata
+            summary_file.write_text(metadata_text, encoding='utf-8')
         
         print(f"Summary saved to: {summary_file}")
         print("\n" + "="*50)
         print("SUMMARY:")
         print("="*50)
-        print(summary)
+        # Display the full content (metadata + summary) if it was just generated
+        if summary_file.exists():
+            full_content = summary_file.read_text(encoding='utf-8')
+            print(full_content)
         
         # Clean up transcript file if cleanup requested
         if args.cleanup:
