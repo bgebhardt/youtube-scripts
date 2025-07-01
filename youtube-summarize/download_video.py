@@ -18,20 +18,28 @@ class YouTubeDownloader:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
         
-    def download_with_transcript(self, url: str) -> Tuple[str, Optional[str]]:
+    def download_with_transcript(self, url: str, cleanup: bool = False) -> Tuple[str, Optional[str]]:
         """
         Download YouTube video and extract transcript.
         Returns: (video_id, transcript_text or None)
         """
-        # First try to get transcript/subtitles
+        video_id = self._get_video_id(url)
+        
+        # Check if transcript file already exists
+        transcript_file = self.output_dir / f"{video_id}_transcript.txt"
+        if transcript_file.exists():
+            print(f"Found existing transcript: {transcript_file}")
+            transcript = transcript_file.read_text(encoding='utf-8')
+            return video_id, transcript
+        
+        # Try to get transcript/subtitles from YouTube
         transcript = self._extract_transcript(url)
         
         if transcript:
-            video_id = self._get_video_id(url)
             return video_id, transcript
             
         # Fallback: download audio and transcribe with Whisper
-        return self._download_and_transcribe(url)
+        return self._download_and_transcribe(url, cleanup)
     
     def _extract_transcript(self, url: str) -> Optional[str]:
         """Extract transcript/subtitles if available."""
@@ -84,7 +92,7 @@ class YouTubeDownloader:
         
         return ' '.join(transcript_lines)
     
-    def _download_and_transcribe(self, url: str) -> Tuple[str, str]:
+    def _download_and_transcribe(self, url: str, cleanup: bool = False) -> Tuple[str, str]:
         """Download audio and transcribe with Whisper."""
         print("No transcript found. Downloading audio for transcription...")
         
@@ -95,8 +103,12 @@ class YouTubeDownloader:
         # Transcribe with Whisper
         transcript = self._transcribe_audio(audio_file)
         
-        # Clean up audio file
-        audio_file.unlink()
+        # Clean up audio file only if cleanup is requested
+        if cleanup:
+            audio_file.unlink()
+            print(f"Audio file removed: {audio_file}")
+        else:
+            print(f"Audio file saved: {audio_file}")
         
         return video_id, transcript
     

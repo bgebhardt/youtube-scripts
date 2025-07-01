@@ -1,0 +1,40 @@
+# Virtual environment
+venv/
+env/
+.env
+
+# Downloaded files
+downloads/
+*.mp4
+*.mp3
+*.wav
+*.webm
+
+# Transcript and summary files
+*_transcript.txt
+*.summary.txt
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# API keys and secrets
+.env.local
+credentials.json
+config.ini
+
+# Logs
+*.log

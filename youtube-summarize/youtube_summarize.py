@@ -14,7 +14,7 @@ def main():
     parser = argparse.ArgumentParser(description='Download and summarize YouTube videos')
     parser.add_argument('url', help='YouTube video URL')
     parser.add_argument('--output-dir', default='downloads', help='Output directory (default: downloads)')
-    parser.add_argument('--keep-files', action='store_true', help='Keep transcript file after summarization')
+    parser.add_argument('--cleanup', action='store_true', help='Delete interim files (audio, transcript) after summarization')
     
     args = parser.parse_args()
     
@@ -23,7 +23,7 @@ def main():
         
         # Download and extract transcript
         downloader = YouTubeDownloader(args.output_dir)
-        video_id, transcript = downloader.download_with_transcript(args.url)
+        video_id, transcript = downloader.download_with_transcript(args.url, cleanup=args.cleanup)
         
         if not transcript:
             print("Could not extract transcript from video")
@@ -48,8 +48,8 @@ def main():
         print("="*50)
         print(summary)
         
-        # Clean up transcript file if not keeping
-        if not args.keep_files:
+        # Clean up transcript file if cleanup requested
+        if args.cleanup:
             transcript_file.unlink()
             print(f"\nTranscript file removed: {transcript_file}")
             
