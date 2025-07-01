@@ -16,6 +16,8 @@ def main():
     parser.add_argument('--output-dir', default='downloads', help='Output directory (default: downloads)')
     parser.add_argument('--cleanup', action='store_true', help='Delete interim files (audio, transcript) after summarization')
     parser.add_argument('--prompt', default='prompts/default.md', help='Path to prompt file (default: prompts/default.md)')
+    parser.add_argument('--metadata', choices=['none', 'before', 'after'], default='before', 
+                       help='Where to include metadata in summary file: none, before, or after (default: before)')
     
     args = parser.parse_args()
     
@@ -37,7 +39,8 @@ def main():
         print(f"Transcript saved to: {transcript_file}")
         
         # Check if summary already exists
-        summary_file = video_dir / "summary.txt"
+        prompt_name = Path(args.prompt).stem  # Get filename without extension
+        summary_file = video_dir / f"summary.{prompt_name}.md"
         if summary_file.exists():
             print(f"Found existing summary: {summary_file}")
             summary = summary_file.read_text(encoding='utf-8')
@@ -46,8 +49,8 @@ def main():
             print("Generating summary with Gemini...")
             summary = summarize_with_gemini(transcript, metadata, args.prompt)
             
-            # Prepend metadata to summary
-            metadata_text = f"""Video Information:
+            # Format metadata section
+            metadata_section = f"""Video Information:
 - Title: {metadata.get('title', 'N/A')}
 - Channel: {metadata.get('channel', 'N/A')}
 - Upload Date: {metadata.get('upload_date', 'N/A')}
@@ -59,14 +62,32 @@ def main():
 Description:
 {metadata.get('description', 'N/A')}
 
-{"="*60}
+{"="*60}"""
+            
+            # Build final content based on metadata option
+            if args.metadata == 'none':
+                final_content = summary
+            elif args.metadata == 'before':
+                final_content = f"""{metadata_section}
 SUMMARY:
 {"="*60}
 
 {summary}"""
+            else:  # after
+                final_content = f"""{"="*60}
+SUMMARY:
+{"="*60}
+
+{summary}
+
+{"="*60}
+VIDEO INFORMATION:
+{"="*60}
+
+{metadata_section}"""
             
-            # Save summary with metadata
-            summary_file.write_text(metadata_text, encoding='utf-8')
+            # Save summary
+            summary_file.write_text(final_content, encoding='utf-8')
         
         print(f"Summary saved to: {summary_file}")
         print("\n" + "="*50)
@@ -82,7 +103,7 @@ SUMMARY:
             transcript_file.unlink()
             print(f"\nTranscript file removed: {transcript_file}")
             # Also clean up the directory if it's empty (except for summary)
-            remaining_files = [f for f in video_dir.iterdir() if f.name != "summary.txt"]
+            remaining_files = [f for f in video_dir.iterdir() if not f.name.startswith("summary.")]
             if not remaining_files:
                 print(f"Video directory cleaned up: {video_dir}")
             

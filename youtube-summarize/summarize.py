@@ -86,8 +86,9 @@ def main():
         # Generate summary
         summary = summarize_with_gemini(transcript_text, None, prompt_file)
         
-        # Save summary
-        summary_file = transcript_file.with_suffix('.summary.txt')
+        # Save summary with prompt name
+        prompt_name = Path(prompt_file).stem
+        summary_file = transcript_file.parent / f"summary.{prompt_name}.md"
         summary_file.write_text(summary, encoding='utf-8')
         
         print(f"Summary saved to: {summary_file}")
