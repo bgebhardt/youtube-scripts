@@ -10,11 +10,6 @@ downloads/
 *.wav
 *.webm
 
-# Transcript and summary files
-*_transcript.txt
-*.summary.txt
-*_metadata.json
-
 # Python cache
 __pycache__/
 *.pyc
