@@ -60,7 +60,7 @@ def main():
                 summary = summarize_with_ollama(transcript, metadata, args.prompt, model)
             
             # Format metadata section
-            metadata_section = f"""Video Information:
+            metadata_section = f"""# Video Information:
 - Title: {metadata.get('title', 'N/A')}
 - Channel: {metadata.get('channel', 'N/A')}
 - Upload Date: {metadata.get('upload_date', 'N/A')}
@@ -70,7 +70,7 @@ def main():
 - Prompt Used: {args.prompt}
 - LLM Used: {args.llm} ({model})
 
-Description:
+# Description:
 {metadata.get('description', 'N/A')}
 
 {"="*60}"""
