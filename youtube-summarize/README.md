@@ -40,6 +40,37 @@ You can create different custom prompts optimized to summarize different types o
   - prompts/basic.md → summary.basic.md
   - prompts/technical.md → summary.technical.md
 
+LLM Options:
+  - --llm gemini - Use Gemini API (default)
+  - --llm ollama - Use local Ollama
+  - --model <model_name> - Specify model (default: llama3.2 for Ollama, gemini-2.5-flash for Gemini)
+
+  Features:
+  1. Added ollama dependency to requirements.txt
+  2. New summarize_with_ollama() function for local LLM calls
+  3. Model parameter support for both Gemini and Ollama
+  4. Metadata tracking - Records which LLM and model was used
+  5. Error handling with helpful setup instructions for Ollama
+
+  Usage Examples:
+  # Use Gemini (default)
+  ./run.sh https://youtube.com/watch?v=example
+
+  # Use local Ollama with default llama3.2
+  ./run.sh https://youtube.com/watch?v=example --llm ollama
+
+  # Use Ollama with specific model
+  ./run.sh https://youtube.com/watch?v=example --llm ollama --model llama3.1
+
+  # Use different Gemini model
+  ./run.sh https://youtube.com/watch?v=example --llm gemini --model gemini-1.5-pro
+
+  Setup for Ollama:
+  1. Install: brew install ollama
+  2. Start service: ollama serve
+  3. Pull model: ollama pull llama3.2
+
+
 # Setup Notes
 
 You can get your Gemini API key from: [Get API key | Google AI Studio](https://aistudio.google.com/app/apikey)

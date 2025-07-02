@@ -7,7 +7,7 @@ import sys
 import argparse
 from pathlib import Path
 from download_video import YouTubeDownloader
-from summarize import summarize_with_gemini
+from summarize import summarize_with_gemini, summarize_with_ollama
 
 
 def main():
@@ -18,6 +18,10 @@ def main():
     parser.add_argument('--prompt', default='prompts/default.md', help='Path to prompt file (default: prompts/default.md)')
     parser.add_argument('--metadata', choices=['none', 'before', 'after'], default='before', 
                        help='Where to include metadata in summary file: none, before, or after (default: before)')
+    parser.add_argument('--llm', choices=['gemini', 'ollama'], default='gemini',
+                       help='LLM to use for summarization: gemini or ollama (default: gemini)')
+    parser.add_argument('--model', default='llama3.2',
+                       help='Model name for ollama (default: llama3.2) or gemini model')
     
     args = parser.parse_args()
     
@@ -46,8 +50,12 @@ def main():
             summary = summary_file.read_text(encoding='utf-8')
         else:
             # Generate summary
-            print("Generating summary with Gemini...")
-            summary = summarize_with_gemini(transcript, metadata, args.prompt)
+            if args.llm == 'gemini':
+                print("Generating summary with Gemini...")
+                summary = summarize_with_gemini(transcript, metadata, args.prompt, args.model)
+            else:  # ollama
+                print(f"Generating summary with Ollama ({args.model})...")
+                summary = summarize_with_ollama(transcript, metadata, args.prompt, args.model)
             
             # Format metadata section
             metadata_section = f"""Video Information:
@@ -58,6 +66,7 @@ def main():
 - View Count: {metadata.get('view_count', 'N/A')}
 - URL: {metadata.get('webpage_url', 'N/A')}
 - Prompt Used: {args.prompt}
+- LLM Used: {args.llm} ({args.model})
 
 Description:
 {metadata.get('description', 'N/A')}

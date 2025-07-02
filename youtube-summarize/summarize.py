@@ -7,9 +7,10 @@ import os
 import sys
 from pathlib import Path
 from google import genai
+import ollama
 
 
-def summarize_with_gemini(transcript_text: str, metadata: dict = None, prompt_file: str = "prompts/default.md") -> str:
+def summarize_with_gemini(transcript_text: str, metadata: dict = None, prompt_file: str = "prompts/default.md", model: str = "gemini-2.5-flash") -> str:
     """
     Summarize transcript using Gemini Python API.
     """
@@ -46,7 +47,7 @@ Video Metadata:
     
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model=model,
             contents=prompt
         )
         
@@ -54,6 +55,50 @@ Video Metadata:
         
     except Exception as e:
         print(f"Error calling Gemini API: {e}")
+        raise
+
+
+def summarize_with_ollama(transcript_text: str, metadata: dict = None, prompt_file: str = "prompts/default.md", model: str = "llama3.2") -> str:
+    """
+    Summarize transcript using Ollama local LLM.
+    """
+    # Load prompt from file
+    prompt_path = Path(prompt_file)
+    if not prompt_path.exists():
+        raise FileNotFoundError(f"Prompt file not found: {prompt_file}")
+    
+    prompt_template = prompt_path.read_text(encoding='utf-8')
+    
+    # Format metadata for inclusion in prompt
+    metadata_text = ""
+    if metadata:
+        metadata_text = f"""
+Video Metadata:
+- Title: {metadata.get('title', 'N/A')}
+- Channel: {metadata.get('channel', 'N/A')}
+- Upload Date: {metadata.get('upload_date', 'N/A')}
+- Duration: {metadata.get('duration', 'N/A')} seconds
+- Description: {metadata.get('description', 'N/A')[:500]}...
+
+"""
+    
+    prompt = prompt_template.format(
+        transcript_text=transcript_text,
+        metadata=metadata_text
+    )
+    
+    try:
+        response = ollama.generate(
+            model=model,
+            prompt=prompt
+        )
+        
+        return response['response']
+        
+    except Exception as e:
+        print(f"Error calling Ollama: {e}")
+        print("Make sure Ollama is running and the model is installed:")
+        print(f"  ollama pull {model}")
         raise
 
 
