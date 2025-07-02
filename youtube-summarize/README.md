@@ -71,6 +71,28 @@ LLM Options:
   3. Pull model: ollama pull llama3.2
 
 
+To set up your API keys securely:
+
+  1. Copy the example file:
+  cd youtube-summarize
+  cp .env.example .env
+  2. Edit .env with your actual keys:
+  # The .env file is gitignored and won't be committed
+  GEMINI_API_KEY=your_actual_gemini_key
+  OPENAI_API_KEY=your_actual_openai_key
+  3. Use normally - keys load automatically:
+  ./run.sh <youtube_url>
+
+  Alternative Options:
+
+  Option 2: Shell Profile (Global)
+  Add to your ~/.bashrc or ~/.zshrc:
+  export OPENAI_API_KEY="your_key_here"
+  export GEMINI_API_KEY="your_key_here"
+
+  Option 3: One-time Environment
+  OPENAI_API_KEY=your_key ./run.sh <url>
+
 # Setup Notes
 
 You can get your Gemini API key from: [Get API key | Google AI Studio](https://aistudio.google.com/app/apikey)
