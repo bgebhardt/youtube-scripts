@@ -178,3 +178,144 @@ Add this section to the end of any summary:
 - [ ] Are there 3-10 tags total?
 - [ ] Mix of broad (#gaming) and specific (#dnd5e) tags included?
 - [ ] No redundant or overly similar tags?
+
+## Adding Timestamps
+
+Add this to prompts to add key timestamps
+
+General Addition for All Prompts:
+Add this section to your guidelines:
+
+## Timestamp Integration
+- Extract timestamps from the transcript for all key points
+- Format as **[MM:SS]** at the beginning of each bullet point
+- Focus on timestamps for actionable content, major explanations, and important moments
+- When exact timestamps aren't available, estimate based on transcript position
+
+Updated Key Takeaways Section:
+Replace your current bullet points with:
+## Key Takeaways
+- **[2:15]** [Your key point with specific timestamp for direct navigation]
+- **[5:42]** [Second key point - viewers can jump directly to this moment]
+- **[8:30]** [Continue with timestamped insights]
+
+For Your Product Review Prompt:
+Update the Pros/Cons sections to:
+## Pros
+- **[3:45]** [Specific advantage with timestamp to demonstration]
+- **[6:20]** [Another strength with example timestamp]
+
+## Cons
+- **[9:10]** [Limitation explained with timestamp to relevant discussion]
+This transforms your summaries from static text into interactive video navigation tools. Viewers can click through to exactly the moments that matter most to them, making your summaries much more valuable for busy users who want to verify specific points or see demonstrations firsthand.
+
+# Timestamp Integration Instructions
+
+## Timestamp Extraction Guidelines
+
+When creating summaries, extract and include timestamps for key points to enable direct navigation to relevant video sections. This transforms summaries from passive text into interactive viewing guides.
+
+### How to Handle Timestamps
+
+**Transcript Format Recognition:**
+- Look for timestamps in formats like: `[00:15]`, `0:15`, `(2:30)`, `2m30s`, or `at 5 minutes`
+- Convert all timestamps to `MM:SS` or `H:MM:SS` format for consistency
+- When exact timestamps aren't available, use approximate times based on transcript position
+
+**Timestamp Placement Rules:**
+- Include timestamps for all major points and key moments
+- Prioritize actionable content, important announcements, and key explanations
+- Add timestamps to specific examples, demonstrations, or code snippets
+- Include timestamps for section transitions and topic changes
+
+### Updated Output Sections
+
+#### For Key Points/Takeaways:
+```
+## Key Takeaways
+- **[2:15]** [First key point with specific timestamp]
+- **[5:42]** [Second key point - link directly to relevant moment]  
+- **[8:30]** [Continue with timestamped points]
+- **[12:05]** [Include timestamps for demos, examples, or important explanations]
+```
+
+#### For Technical Content:
+```
+## Technical Details
+- **[3:20]** [Code example or configuration step]
+- **[7:45]** [Installation process or setup instructions]
+- **[11:15]** [Troubleshooting section or common errors]
+```
+
+#### For Tutorials/How-To Content:
+```
+## Step-by-Step Guide
+1. **[1:30]** [First step with timestamp]
+2. **[4:15]** [Second step - viewers can jump directly here]
+3. **[7:00]** [Continue with all major steps timestamped]
+```
+
+#### For Reviews:
+```
+## Pros
+- **[3:45]** [Specific advantage discussed at this time]
+- **[6:20]** [Another pro with demonstration timestamp]
+
+## Cons  
+- **[9:10]** [Weakness or limitation explained here]
+- **[12:30]** [Another con with example timestamp]
+```
+
+### Timestamp Quality Guidelines
+
+**Accuracy Priority:**
+- Use exact timestamps when available in transcript
+- For approximate times, round to nearest 5-15 seconds
+- Err on the side of starting slightly before the content begins
+
+**Coverage Goals:**
+- Include timestamps for 60-80% of key points
+- Prioritize the most valuable or complex explanations
+- Don't timestamp every minor detail - focus on jump-worthy content
+
+**Format Consistency:**
+- Always use `**[MM:SS]**` format at the start of bullet points
+- For videos over 1 hour, use `**[H:MM:SS]**` format
+- Keep timestamp format consistent throughout the summary
+
+### Special Timestamp Sections
+
+#### For Long-Form Content:
+```
+## Chapter Breakdown
+- **[0:00]** Introduction and overview
+- **[3:15]** Main topic begins  
+- **[12:30]** Key demonstration or example
+- **[18:45]** Advanced concepts
+- **[25:10]** Conclusion and next steps
+```
+
+#### For Multi-Topic Videos:
+```
+## Topic Timestamps
+- **[2:10]** Topic 1: [Brief description]
+- **[8:30]** Topic 2: [Brief description]  
+- **[15:45]** Topic 3: [Brief description]
+```
+
+### Implementation Notes
+
+**When Timestamps Aren't Available:**
+- Note in summary: "Timestamps not available in transcript"
+- Still provide detailed summary but mention limitation
+- Consider adding section headers instead of timestamps
+
+**Timestamp Validation:**
+- Ensure timestamps make logical sense (increasing order)
+- Verify major timestamps align with key content
+- Remove any obviously incorrect timestamps
+
+**User Experience:**
+- Timestamps should make the video more navigable, not cluttered
+- Focus on moments where viewers would want to jump directly
+- Balance detail with usability
