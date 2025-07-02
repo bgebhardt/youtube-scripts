@@ -2,6 +2,19 @@
 
 A set of scripts for summarizing youtube videos.
 
+# Next steps
+
+Now that first version is working need to figure out a workflow. My desired workflow is:
+
+1. on a youtube url 
+2. trigger an AppleScript that gets the url and triggers the run.sh script that will summarize the video. It takes 15-30 seconds so it needs to be an asynchronous UI that notifies me when the script is done.
+3. result copied to the clipboard
+4. paste the result into an obsidian note (or anywhere else I need it)
+
+
+Future want the ability to pick different prompts to use.
+
+
 # Summary
 
   To use:

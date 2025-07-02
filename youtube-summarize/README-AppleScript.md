@@ -6,29 +6,50 @@ This directory contains AppleScript automation to summarize YouTube videos direc
 
 ## Files
 
-- `summarize-current-tab.applescript` - AppleScript that captures current Edge tab URL and summarizes it
-- `summarize-brave-tab.sh` - Shell wrapper for the AppleScript
+### Asynchronous Version (Original)
+- `youtube-summarizer.applescript` - Complex async version with background processing
+- Not currently working due to callback issues
+
+### Synchronous Version (Recommended)
+- `summarize-current-tab-sync.applescript` - Synchronous AppleScript that waits for completion
+- `summarize-current-tab-sync.sh` - Shell wrapper for the synchronous AppleScript
+
+### Legacy Files
+- `summarize-current-tab.scpt` - Simple Edge-only version
+- `summarize-edge-tab.sh` - Shell wrapper for Edge-only version
 
 ## Usage
 
-### Method 1: Shell Script (Recommended)
+### Method 1: Synchronous Shell Script (Recommended)
 ```bash
-./summarize-brave-tab.sh
+./summarize-current-tab-sync.sh
 ```
 
-### Method 2: Direct AppleScript
-Double-click `summarize-current-tab.scpt` or run:
+### Method 2: Direct Synchronous AppleScript
+Double-click `summarize-current-tab-sync.applescript` or run:
 ```bash
-osascript summarize-current-tab.applescript
+osascript summarize-current-tab-sync.applescript
 ```
 
-## What It Does
+### Legacy Methods
+```bash
+# Edge-only version
+./summarize-edge-tab.sh
 
-1. **Captures Current Tab**: Gets the URL from the active tab in Microsoft Edge
-2. **Validates YouTube**: Ensures the URL is from YouTube (youtube.com or youtu.be)
-3. **Runs Summarizer**: Executes the `./run.sh` script with the captured URL
-4. **Copies to Clipboard**: Automatically copies the generated summary to your clipboard
-5. **Shows Success**: Displays a dialog with completion status
+# Simple Edge-only AppleScript
+osascript summarize-current-tab.scpt
+```
+
+## What the Synchronous Version Does
+
+1. **Multi-Browser Support**: Checks Brave, Edge, Safari, Chrome, and Arc in order
+2. **Validates YouTube**: Ensures the URL is from YouTube (youtube.com, youtu.be, etc.)
+3. **Shows Progress**: Displays notification that processing has started
+4. **Runs Synchronously**: Executes `./run.sh` and waits for completion (1-2 minutes)
+5. **Reads Summary File**: Finds and reads the generated summary markdown file
+6. **Copies to Clipboard**: Automatically copies the complete summary to clipboard
+7. **Shows Preview**: Displays success dialog with summary preview
+8. **Obsidian Integration**: Optional button to open Obsidian for note-taking
 
 ## Setup Requirements
 
