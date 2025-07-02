@@ -36,6 +36,10 @@ source venv/bin/activate   # Manual venv activation
 # Advanced usage examples
 ./run.sh <url> --prompt prompts/review.md --llm ollama --model llama3.1
 ./run.sh <url> --metadata none --cleanup
+
+# Summarize current Microsoft Edge tab (AppleScript)
+./summarize-edge-tab.sh
+# or double-click: summarize-current-tab.scpt
 ```
 
 ### Direct Python Usage
