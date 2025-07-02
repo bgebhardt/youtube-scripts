@@ -20,8 +20,8 @@ def main():
                        help='Where to include metadata in summary file: none, before, or after (default: before)')
     parser.add_argument('--llm', choices=['gemini', 'ollama'], default='gemini',
                        help='LLM to use for summarization: gemini or ollama (default: gemini)')
-    parser.add_argument('--model', default='llama3.2',
-                       help='Model name for ollama (default: llama3.2) or gemini model')
+    parser.add_argument('--model', default=None,
+                       help='Model name (default: gemini-2.5-flash for gemini, llama3.2 for ollama)')
     
     args = parser.parse_args()
     
@@ -51,11 +51,13 @@ def main():
         else:
             # Generate summary
             if args.llm == 'gemini':
-                print("Generating summary with Gemini...")
-                summary = summarize_with_gemini(transcript, metadata, args.prompt, args.model)
+                model = args.model or 'gemini-2.5-flash'
+                print(f"Generating summary with Gemini ({model})...")
+                summary = summarize_with_gemini(transcript, metadata, args.prompt, model)
             else:  # ollama
-                print(f"Generating summary with Ollama ({args.model})...")
-                summary = summarize_with_ollama(transcript, metadata, args.prompt, args.model)
+                model = args.model or 'llama3.2'
+                print(f"Generating summary with Ollama ({model})...")
+                summary = summarize_with_ollama(transcript, metadata, args.prompt, model)
             
             # Format metadata section
             metadata_section = f"""Video Information:
@@ -66,7 +68,7 @@ def main():
 - View Count: {metadata.get('view_count', 'N/A')}
 - URL: {metadata.get('webpage_url', 'N/A')}
 - Prompt Used: {args.prompt}
-- LLM Used: {args.llm} ({args.model})
+- LLM Used: {args.llm} ({model})
 
 Description:
 {metadata.get('description', 'N/A')}
