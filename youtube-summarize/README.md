@@ -77,6 +77,9 @@ LLM Options:
 
   # Use different Gemini model
   ./run.sh https://youtube.com/watch?v=example --llm gemini --model gemini-1.5-pro
+  
+  # Quiet mode (disable verbose logging)
+  ./run.sh https://youtube.com/watch?v=example --no-verbose
 
   Setup for Ollama:
   1. Install: brew install ollama

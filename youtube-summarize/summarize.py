@@ -8,6 +8,7 @@ import sys
 from pathlib import Path
 from google import genai
 import ollama
+from logger import log_info, log_warning, log_error, log_output
 
 
 def summarize_with_gemini(transcript_text: str, metadata: dict = None, prompt_file: str = "prompts/default.md", model: str = "gemini-2.5-flash") -> str:
@@ -54,7 +55,7 @@ Video Metadata:
         return response.text
         
     except Exception as e:
-        print(f"Error calling Gemini API: {e}")
+        log_error(f"Error calling Gemini API: {e}")
         raise
 
 
@@ -96,21 +97,21 @@ Video Metadata:
         return response['response']
         
     except Exception as e:
-        print(f"Error calling Ollama: {e}")
-        print("Make sure Ollama is running and the model is installed:")
-        print(f"  ollama pull {model}")
+        log_error(f"Error calling Ollama: {e}")
+        log_error("Make sure Ollama is running and the model is installed:")
+        log_error(f"  ollama pull {model}")
         raise
 
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: python summarize.py <transcript_file>")
+        log_error("Usage: python summarize.py <transcript_file>")
         sys.exit(1)
         
     transcript_file = Path(sys.argv[1])
     
     if not transcript_file.exists():
-        print(f"Transcript file not found: {transcript_file}")
+        log_error(f"Transcript file not found: {transcript_file}")
         sys.exit(1)
         
     try:
@@ -118,10 +119,10 @@ def main():
         transcript_text = transcript_file.read_text(encoding='utf-8')
         
         if not transcript_text.strip():
-            print("Transcript file is empty")
+            log_error("Transcript file is empty")
             sys.exit(1)
             
-        print("Generating summary with Gemini...")
+        log_info("Generating summary with Gemini...")
         
         # Use default prompt if running standalone
         prompt_file = "prompts/default.md"
@@ -136,14 +137,14 @@ def main():
         summary_file = transcript_file.parent / f"summary.{prompt_name}.md"
         summary_file.write_text(summary, encoding='utf-8')
         
-        print(f"Summary saved to: {summary_file}")
-        print("\n" + "="*50)
-        print("SUMMARY:")
-        print("="*50)
-        print(summary)
+        log_info(f"Summary saved to: {summary_file}")
+        log_output("\n" + "="*50)
+        log_output("SUMMARY:")
+        log_output("="*50)
+        log_output(summary)
         
     except Exception as e:
-        print(f"Error: {e}")
+        log_error(f"Error: {e}")
         sys.exit(1)
 
 

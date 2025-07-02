@@ -37,9 +37,14 @@ source venv/bin/activate   # Manual venv activation
 ./run.sh <url> --prompt prompts/review.md --llm ollama --model llama3.1
 ./run.sh <url> --metadata none --cleanup
 
-# Summarize current Microsoft Edge tab (AppleScript)
+# Quiet mode (disable verbose logging)
+./run.sh <url> --no-verbose
+
+# Synchronous browser tab summarization (recommended)
+./summarize-current-tab-sync.sh
+
+# Legacy Edge-only version
 ./summarize-edge-tab.sh
-# or double-click: summarize-current-tab.scpt
 ```
 
 ### Direct Python Usage

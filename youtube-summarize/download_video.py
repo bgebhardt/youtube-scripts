@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Optional, Tuple, Dict
 import yt_dlp
 import whisper
+from logger import log_info, log_warning, log_error, log_output
 
 
 class YouTubeDownloader:
@@ -38,14 +39,14 @@ class YouTubeDownloader:
         metadata_file = video_dir / "metadata.json"
         if not metadata_file.exists():
             metadata_file.write_text(json.dumps(metadata, indent=2, ensure_ascii=False), encoding='utf-8')
-            print(f"Metadata saved to: {metadata_file}")
+            log_info(f"Metadata saved to: {metadata_file}")
         else:
-            print(f"Found existing metadata: {metadata_file}")
+            log_info(f"Found existing metadata: {metadata_file}")
         
         # Check if transcript file already exists
         transcript_file = video_dir / "transcript.txt"
         if transcript_file.exists():
-            print(f"Found existing transcript: {transcript_file}")
+            log_info(f"Found existing transcript: {transcript_file}")
             transcript = transcript_file.read_text(encoding='utf-8')
             return video_id, transcript, metadata, folder_name
         
@@ -84,7 +85,7 @@ class YouTubeDownloader:
                         return self._parse_subtitle_file(subtitle_file)
                         
         except Exception as e:
-            print(f"Could not extract transcript: {e}")
+            log_warning(f"Could not extract transcript: {e}")
             
         return None
     
@@ -112,7 +113,7 @@ class YouTubeDownloader:
     
     def _download_and_transcribe(self, url: str, video_dir: Path, cleanup: bool = False) -> Tuple[str, str]:
         """Download audio and transcribe with Whisper."""
-        print("No transcript found. Downloading audio for transcription...")
+        log_info("No transcript found. Downloading audio for transcription...")
         
         # Download audio only
         audio_file = self._download_audio(url, video_dir)
@@ -124,9 +125,9 @@ class YouTubeDownloader:
         # Clean up audio file only if cleanup is requested
         if cleanup:
             audio_file.unlink()
-            print(f"Audio file removed: {audio_file}")
+            log_info(f"Audio file removed: {audio_file}")
         else:
-            print(f"Audio file saved: {audio_file}")
+            log_info(f"Audio file saved: {audio_file}")
         
         return video_id, transcript
     
@@ -150,7 +151,7 @@ class YouTubeDownloader:
     
     def _transcribe_audio(self, audio_file: Path) -> str:
         """Transcribe audio using OpenAI Whisper."""
-        print("Transcribing audio with Whisper...")
+        log_info("Transcribing audio with Whisper...")
         
         model = whisper.load_model("base")
         result = model.transcribe(str(audio_file))
@@ -207,7 +208,7 @@ class YouTubeDownloader:
 
 def main():
     if len(sys.argv) != 2:
-        print("Usage: python download_video.py <youtube_url>")
+        log_error("Usage: python download_video.py <youtube_url>")
         sys.exit(1)
         
     url = sys.argv[1]
@@ -221,10 +222,10 @@ def main():
         transcript_file = video_dir / "transcript.txt"
         transcript_file.write_text(transcript, encoding='utf-8')
         
-        print(f"Transcript saved to: {transcript_file}")
+        log_output(f"Transcript saved to: {transcript_file}")
         
     except Exception as e:
-        print(f"Error: {e}")
+        log_error(f"Error: {e}")
         sys.exit(1)
 
 
