@@ -27,8 +27,11 @@ class YouTubeDownloader:
         metadata = self._extract_metadata(url)
         video_id = metadata['id']
         
-        # Create video-specific directory
-        video_dir = self.output_dir / video_id
+        # Create video-specific directory with format {id}-{channel}-{title}
+        channel = self._sanitize_filename(metadata.get('channel', 'Unknown'))
+        title = self._sanitize_filename(metadata.get('title', 'Unknown'))
+        folder_name = f"{video_id}-{channel}-{title}"
+        video_dir = self.output_dir / folder_name
         video_dir.mkdir(exist_ok=True)
         
         # Save metadata to file
@@ -44,17 +47,17 @@ class YouTubeDownloader:
         if transcript_file.exists():
             print(f"Found existing transcript: {transcript_file}")
             transcript = transcript_file.read_text(encoding='utf-8')
-            return video_id, transcript, metadata
+            return video_id, transcript, metadata, folder_name
         
         # Try to get transcript/subtitles from YouTube
         transcript = self._extract_transcript(url, video_dir)
         
         if transcript:
-            return video_id, transcript, metadata
+            return video_id, transcript, metadata, folder_name
             
         # Fallback: download audio and transcribe with Whisper
         video_id, transcript = self._download_and_transcribe(url, video_dir, cleanup)
-        return video_id, transcript, metadata
+        return video_id, transcript, metadata, folder_name
     
     def _extract_transcript(self, url: str, video_dir: Path) -> Optional[str]:
         """Extract transcript/subtitles if available."""
@@ -180,6 +183,21 @@ class YouTubeDownloader:
             
             return metadata
     
+    def _sanitize_filename(self, filename: str) -> str:
+        """Sanitize filename by removing/replacing invalid characters."""
+        # Remove or replace characters that are invalid in filenames
+        import re
+        # Replace invalid characters with underscores
+        sanitized = re.sub(r'[<>:"/\\|?*]', '_', filename)
+        # Remove excessive spaces and replace with single underscore
+        sanitized = re.sub(r'\s+', '_', sanitized)
+        # Remove leading/trailing underscores and dots
+        sanitized = sanitized.strip('_.')
+        # Limit length to avoid filesystem issues
+        if len(sanitized) > 50:
+            sanitized = sanitized[:50].rstrip('_')
+        return sanitized
+    
     def _get_video_id(self, url: str) -> str:
         """Extract video ID from URL."""
         with yt_dlp.YoutubeDL() as ydl:
@@ -196,10 +214,10 @@ def main():
     downloader = YouTubeDownloader()
     
     try:
-        video_id, transcript, metadata = downloader.download_with_transcript(url)
+        video_id, transcript, metadata, folder_name = downloader.download_with_transcript(url)
         
         # Save transcript to file
-        video_dir = downloader.output_dir / video_id
+        video_dir = downloader.output_dir / folder_name
         transcript_file = video_dir / "transcript.txt"
         transcript_file.write_text(transcript, encoding='utf-8')
         

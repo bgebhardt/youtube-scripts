@@ -30,14 +30,14 @@ def main():
         
         # Download and extract transcript
         downloader = YouTubeDownloader(args.output_dir)
-        video_id, transcript, metadata = downloader.download_with_transcript(args.url, cleanup=args.cleanup)
+        video_id, transcript, metadata, folder_name = downloader.download_with_transcript(args.url, cleanup=args.cleanup)
         
         if not transcript:
             print("Could not extract transcript from video")
             sys.exit(1)
             
         # Save transcript
-        video_dir = downloader.output_dir / video_id
+        video_dir = downloader.output_dir / folder_name
         transcript_file = video_dir / "transcript.txt"
         transcript_file.write_text(transcript, encoding='utf-8')
         print(f"Transcript saved to: {transcript_file}")
