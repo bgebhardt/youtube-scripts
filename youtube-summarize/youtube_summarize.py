@@ -23,6 +23,8 @@ def main():
                        help='LLM to use for summarization: gemini or ollama (default: gemini)')
     parser.add_argument('--model', default=None,
                        help='Model name (default: gemini-2.5-flash for gemini, llama3.2 for ollama)')
+    parser.add_argument('--transcription-engine', choices=['whisper', 'parakeet'], default='whisper',
+                       help='Transcription engine to use: whisper or parakeet (default: whisper)')
     parser.add_argument('-v', '--verbose', action='store_true', default=False,
                        help='Enable verbose output (default: disabled)')
     parser.add_argument('--no-verbose', dest='verbose', action='store_false',
@@ -37,7 +39,7 @@ def main():
         log_info(f"Processing YouTube video: {args.url}")
         
         # Download and extract transcript
-        downloader = YouTubeDownloader(args.output_dir)
+        downloader = YouTubeDownloader(args.output_dir, transcription_engine=args.transcription_engine)
         video_id, transcript, metadata, folder_name = downloader.download_with_transcript(args.url, cleanup=args.cleanup)
         
         if not transcript:

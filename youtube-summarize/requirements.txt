@@ -2,3 +2,4 @@ yt-dlp>=2023.12.30
 openai-whisper>=20231117
 google-genai
 ollama
+parakeet-mlx

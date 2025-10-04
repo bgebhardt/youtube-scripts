@@ -13,11 +13,32 @@ import yt_dlp
 import whisper
 from logger import log_info, log_warning, log_error, log_output
 
+# Parakeet import (optional)
+try:
+    from parakeet_mlx import from_pretrained
+    PARAKEET_AVAILABLE = True
+except ImportError:
+    PARAKEET_AVAILABLE = False
+
 
 class YouTubeDownloader:
-    def __init__(self, output_dir: str = "downloads"):
+    def __init__(self, output_dir: str = "downloads", transcription_engine: str = "whisper"):
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
+        self.transcription_engine = transcription_engine
+
+        # Validate transcription engine
+        if transcription_engine == "parakeet" and not PARAKEET_AVAILABLE:
+            log_error("Parakeet engine requested but parakeet-mlx is not installed.")
+            log_error("Install with: pip install parakeet-mlx -U")
+            raise ImportError("parakeet-mlx not available")
+
+        # Load Parakeet model once if using parakeet
+        self.parakeet_model = None
+        if transcription_engine == "parakeet":
+            log_info("Loading Parakeet model...")
+            self.parakeet_model = from_pretrained("mlx-community/parakeet-tdt-0.6b-v3")
+            log_info("Parakeet model loaded successfully")
         
     def download_with_transcript(self, url: str, cleanup: bool = False) -> Tuple[str, Optional[str], Dict]:
         """
@@ -150,13 +171,28 @@ class YouTubeDownloader:
         return audio_file
     
     def _transcribe_audio(self, audio_file: Path) -> str:
+        """Transcribe audio using configured transcription engine."""
+        if self.transcription_engine == "parakeet":
+            return self._transcribe_with_parakeet(audio_file)
+        else:
+            return self._transcribe_with_whisper(audio_file)
+
+    def _transcribe_with_whisper(self, audio_file: Path) -> str:
         """Transcribe audio using OpenAI Whisper."""
         log_info("Transcribing audio with Whisper...")
-        
+
         model = whisper.load_model("base")
         result = model.transcribe(str(audio_file))
-        
+
         return result["text"]
+
+    def _transcribe_with_parakeet(self, audio_file: Path) -> str:
+        """Transcribe audio using Parakeet-MLX."""
+        log_info("Transcribing audio with Parakeet...")
+
+        result = self.parakeet_model.transcribe(str(audio_file))
+
+        return result.text
     
     def _extract_metadata(self, url: str) -> Dict:
         """Extract video metadata."""

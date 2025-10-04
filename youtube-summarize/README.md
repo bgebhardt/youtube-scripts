@@ -58,6 +58,10 @@ LLM Options:
   - --llm ollama - Use local Ollama
   - --model <model_name> - Specify model (default: llama3.2 for Ollama, gemini-2.5-flash for Gemini)
 
+Transcription Engine Options:
+  - --transcription-engine whisper - Use OpenAI Whisper (default)
+  - --transcription-engine parakeet - Use Nvidia Parakeet-MLX (faster, Apple Silicon only)
+
   Features:
   1. Added ollama dependency to requirements.txt
   2. New summarize_with_ollama() function for local LLM calls
@@ -85,6 +89,11 @@ LLM Options:
   1. Install: brew install ollama
   2. Start service: ollama serve
   3. Pull model: ollama pull llama3.2
+
+  Setup for Parakeet (Apple Silicon only):
+  1. Install: pip install parakeet-mlx -U
+  2. Requires ffmpeg: brew install ffmpeg (usually already installed)
+  3. Use: ./run.sh <url> --transcription-engine parakeet
 
 
 To set up your API keys securely:
